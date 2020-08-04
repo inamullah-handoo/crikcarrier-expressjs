@@ -14,4 +14,6 @@ The development is currently in progress.
 
 ### Hoping to finish it soon
 
-#### Check '.gitignore' for files which is to be needed
+```
+Check '.gitignore' for files which is to be needed
+```
