@@ -11,7 +11,11 @@ const matchSchema = mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	date: {
+	datePlayed: {
+		type: String,
+		required: true,
+	},
+	dateLastModified: {
 		type: String,
 		required: true,
 	},
@@ -111,6 +115,18 @@ const matchSchema = mongoose.Schema({
 const Match = (module.exports = mongoose.model('Match', matchSchema));
 
 // functions
-module.exports.addMatch = (obj, callback) => {
-	obj.save(callback);
+
+// save match
+module.exports.addMatch = (doc, callback) => {
+	doc.save(callback);
+};
+
+// show match
+module.exports.showMatch = (id, callback) => {
+	Match.findById(id, callback);
+};
+
+// update match
+module.exports.updateMatch = (query, doc, callback) => {
+	Match.replaceOne(query, doc, callback);
 };
