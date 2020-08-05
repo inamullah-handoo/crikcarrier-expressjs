@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { validationResult } = require('express-validator');
 
-const matchDetailsValidation = require('../helper/validate');
+// helper (keeps this file small)
+const matchDetailsValidation = require('../helper/matchValidate');
 const matchDetails = require('../helper/matchDetails');
 
 // models
@@ -72,6 +73,17 @@ router.post('/modify/:id', matchDetailsValidation.validate, (req, res) => {
 					}
 				});
 			}
+		}
+	});
+});
+
+// delete match
+router.delete('/delete/:id', (req, res) => {
+	Match.deleteMatch({ _id: req.params.id }, (err) => {
+		if (err) {
+			res.json({ success: false, msg: err.message });
+		} else {
+			res.json({ success: true, msg: 'Deleted' });
 		}
 	});
 });

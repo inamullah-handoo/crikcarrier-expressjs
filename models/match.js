@@ -130,3 +130,8 @@ module.exports.showMatch = (id, callback) => {
 module.exports.updateMatch = (query, doc, callback) => {
 	Match.replaceOne(query, doc, callback);
 };
+
+// delete match
+module.exports.deleteMatch = (query, callback) => {
+	Match.deleteOne(query, callback);
+};
