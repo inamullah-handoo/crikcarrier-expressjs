@@ -29,10 +29,14 @@ app.use(cors());
 // route files
 const main = require('./routes/main');
 const match = require('./routes/match');
+const list = require('./routes/listView');
+const progress = require('./routes/progress');
 
 //routes
 app.use('/api/', main);
 app.use('/api/match/', match);
+app.use('/api/list/match/', list);
+app.use('/api/progress/match/', progress);
 
 // start server
 let port = 3000;
