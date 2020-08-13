@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { body, validationResult } = require('express-validator');
 
 // models
 const Match = require('../models/match');
@@ -20,17 +21,35 @@ router.get('/overall', (req, res) => {
 });
 
 // tournament
-router.get('/tournament', async (req, res) => {
-	let doc = await Match.listMatches('123', 'tournament', req.body.tournament);
-	if (doc.error) {
-		res.json({ success: false, msg: doc.error });
-	} else {
-		res.json({ success: true, msg: doc.doc });
+router.get(
+	'/tournament',
+	[body('tournament').trim().notEmpty()],
+	async (req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
+		}
+
+		let doc = await Match.listMatches(
+			'123',
+			'tournament',
+			req.body.tournament
+		);
+		if (doc.error) {
+			res.json({ success: false, msg: doc.error });
+		} else {
+			res.json({ success: true, msg: doc.doc });
+		}
 	}
-});
+);
 
 // month
-router.get('/month', async (req, res) => {
+router.get('/month', [body('month').trim().notEmpty()], async (req, res) => {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	}
+
 	let month = [];
 	for (let i = 1; i <= 31; i++) {
 		month.push(i + '-' + req.body.month);
@@ -44,7 +63,12 @@ router.get('/month', async (req, res) => {
 });
 
 // year
-router.get('/year', async (req, res) => {
+router.get('/year', [body('year').trim().notEmpty()], async (req, res) => {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	}
+
 	let year = [];
 	for (let i = 1; i <= 31; i++) {
 		for (let j = 1; j <= 12; j++) {

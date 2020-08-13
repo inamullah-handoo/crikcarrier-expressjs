@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { body, validationResult } = require('express-validator');
 
 // models
 const Match = require('../models/match');
@@ -10,6 +11,7 @@ router.get('/overall', (req, res) => {
 		if (err) {
 			res.json({ success: false, msg: err.message });
 		} else {
+			// collect years
 			let years = [];
 			for (let i = 0; i < docs.length; i++) {
 				if (i == 0) {
@@ -28,6 +30,7 @@ router.get('/overall', (req, res) => {
 				}
 			}
 
+			// details for each year
 			let result = [];
 
 			for (let i = 0; i < years.length; i++) {
@@ -51,18 +54,31 @@ router.get('/overall', (req, res) => {
 });
 
 // tournament
-router.get('/tournament', async (req, res) => {
-	const tournament = req.body.tournament;
-	let op = await Match.progressTournament('123', tournament);
-	if (op.error) {
-		res.json({ success: false, op: op.error });
-	} else {
-		res.json({ success: true, op: op.matches });
+router.get(
+	'/tournament',
+	[body('tournament').trim().notEmpty()],
+	async (req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
+		}
+
+		const tournament = req.body.tournament;
+		let op = await Match.progressTournament('123', tournament);
+		if (op.error) {
+			res.json({ success: false, op: op.error });
+		} else {
+			res.json({ success: true, op: op.matches });
+		}
 	}
-});
+);
 
 // year
-router.get('/year', async (req, res) => {
+router.get('/year', [body('year').trim().notEmpty()], async (req, res) => {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	}
 	const yearIP = req.body.year;
 	let year = [];
 	for (let j = 1; j <= 31; j++) {
@@ -71,6 +87,8 @@ router.get('/year', async (req, res) => {
 		}
 	}
 	let doc = await Match.listMatches('123', 'date', year);
+
+	// collect months
 	let months = [];
 	for (let i = 0; i < doc.doc.length; i++) {
 		if (i == 0) {
@@ -88,6 +106,8 @@ router.get('/year', async (req, res) => {
 			}
 		}
 	}
+
+	// details for each month
 	let result = [];
 	for (let i = 0; i < months.length; i++) {
 		let docs = await Match.progressYear('123', months[i], yearIP);

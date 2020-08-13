@@ -243,29 +243,33 @@ module.exports.progressTournament = async (id, value) => {
 			if (err) {
 				error = err;
 			} else {
-				for (let i = 0; i < doc.length; i++) {
-					let temp = {};
-					if (doc[i].bat_batPos) {
-						temp.bat = {
-							batRuns: doc[i].bat_runs,
-							batBalls: doc[i].bat_balls,
-						};
+				if (!doc[0]) {
+					error = 'No matches found';
+				} else {
+					for (let i = 0; i < doc.length; i++) {
+						let temp = {};
+						if (doc[i].bat_batPos) {
+							temp.bat = {
+								batRuns: doc[i].bat_runs,
+								batBalls: doc[i].bat_balls,
+							};
+						}
+						if (doc[i].bowl_overs) {
+							temp.bowl = {
+								bowlWickets: doc[i].bowl_wickets,
+								bowlRuns: doc[i].bowl_runs,
+								bowlBalls: doc[i].bowl_overs * 6,
+							};
+						}
+						matches.push({
+							bat: temp.bat,
+							bowl: temp.bowl,
+							opposite: doc[i].playedAgainst,
+							catches: doc[i].catches,
+							runOuts: doc[i].runOuts,
+							stumps: doc[i].stumps,
+						});
 					}
-					if (doc[i].bowl_overs) {
-						temp.bowl = {
-							bowlWickets: doc[i].bowl_wickets,
-							bowlRuns: doc[i].bowl_runs,
-							bowlBalls: doc[i].bowl_overs * 6,
-						};
-					}
-					matches.push({
-						bat: temp.bat,
-						bowl: temp.bowl,
-						opposite: doc[i].playedAgainst,
-						catches: doc[i].catches,
-						runOuts: doc[i].runOuts,
-						stumps: doc[i].stumps,
-					});
 				}
 			}
 		}
@@ -293,17 +297,21 @@ module.exports.progressYear = async (id, month, year) => {
 		if (err) {
 			error = err;
 		} else {
-			catches = doc[0].catches;
-			runOuts = doc[0].runOuts;
-			stumps = doc[0].stumps;
-			if (doc[0].bat_batPos) {
-				batRuns = doc[0].bat_runs;
-				batBalls = doc[0].bat_balls;
-			}
-			if (doc[0].bowl_overs) {
-				bowlWickets = doc[0].bowl_wickets;
-				bowlRuns = doc[0].bowl_runs;
-				bowlBalls = doc[0].bowl_overs * 6;
+			if (!doc[0]) {
+				error = 'No matches found';
+			} else {
+				catches = doc[0].catches;
+				runOuts = doc[0].runOuts;
+				stumps = doc[0].stumps;
+				if (doc[0].bat_batPos) {
+					batRuns = doc[0].bat_runs;
+					batBalls = doc[0].bat_balls;
+				}
+				if (doc[0].bowl_overs) {
+					bowlWickets = doc[0].bowl_wickets;
+					bowlRuns = doc[0].bowl_runs;
+					bowlBalls = doc[0].bowl_overs * 6;
+				}
 			}
 		}
 	});

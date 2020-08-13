@@ -12,7 +12,7 @@ mongoose.connect(config.database, {
 	useCreateIndex: true,
 });
 let db = mongoose.connection;
-// check db connecction
+// check db connection
 db.once('open', () => console.log(`Connected to db ${config.database}`));
 db.on('error', (err) => console.log(`Error in connecting to db: ${err}`));
 
