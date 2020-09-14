@@ -140,11 +140,6 @@ module.exports.deleteMatch = (id, callback) => {
 	Match.deleteOne({ _id: id }, callback);
 };
 
-// listView all matches for a user
-module.exports.listOverall = (id, callback) => {
-	Match.find({ userID: id }, callback);
-};
-
 // listView matches for a user
 module.exports.listMatches = async (id, key, value) => {
 	let query = {},
@@ -154,6 +149,8 @@ module.exports.listMatches = async (id, key, value) => {
 		query = { userID: id, tournament: value };
 	} else if (key == 'date') {
 		query = { userID: id, datePlayed: value };
+	} else if (key == 'overall') {
+		query = { userID: id };
 	}
 	await Match.find(query, (err, docs) => {
 		if (err) {

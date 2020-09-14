@@ -6,18 +6,13 @@ const { body, validationResult } = require('express-validator');
 const Match = require('../models/match');
 
 // overall
-router.get('/overall', (req, res) => {
-	Match.listOverall('123', (err, docs) => {
-		if (err) {
-			res.json({ success: false, msg: err.message });
-		} else {
-			if (!docs[0]) {
-				res.json({ success: false, msg: 'No matches found' });
-			} else {
-				res.json({ success: true, docs });
-			}
-		}
-	});
+router.get('/overall', async (req, res) => {
+	let doc = await Match.listMatches('123', 'overall');
+	if (doc.error) {
+		res.json({ success: false, msg: doc.error });
+	} else {
+		res.json({ success: true, msg: doc.doc });
+	}
 });
 
 // tournament

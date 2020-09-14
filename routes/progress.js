@@ -6,51 +6,50 @@ const { body, validationResult } = require('express-validator');
 const Match = require('../models/match');
 
 // overall
-router.get('/overall', (req, res) => {
-	Match.listOverall('123', async (err, docs) => {
-		if (err) {
-			res.json({ success: false, msg: err.message });
-		} else {
-			// collect years
-			let years = [];
-			for (let i = 0; i < docs.length; i++) {
-				if (i == 0) {
-					years.push(docs[i].datePlayed.split('-')[2]);
-				} else {
-					let flag = 0;
-					for (let j = 0; j < years.length; j++) {
-						if (docs[i].datePlayed.split('-')[2] == years[j]) {
-							flag = 1;
-							break;
-						}
+router.get('/overall', async (req, res) => {
+	let doc = await Match.listMatches('123', 'overall');
+	if (doc.error) {
+		res.json({ success: false, msg: doc.error });
+	} else {
+		// collect years
+		let years = [];
+		for (let i = 0; i < doc.doc.length; i++) {
+			if (i == 0) {
+				years.push(doc.doc[i].datePlayed.split('-')[2]);
+			} else {
+				let flag = 0;
+				for (let j = 0; j < years.length; j++) {
+					if (doc.doc[i].datePlayed.split('-')[2] == years[j]) {
+						flag = 1;
+						break;
 					}
-					if (flag == 0) {
-						years.push(docs[i].datePlayed.split('-')[2]);
-					}
+				}
+				if (flag == 0) {
+					years.push(doc.doc[i].datePlayed.split('-')[2]);
 				}
 			}
-
-			// details for each year
-			let result = [];
-
-			for (let i = 0; i < years.length; i++) {
-				let year = [];
-				for (let j = 1; j <= 31; j++) {
-					for (let k = 1; k <= 12; k++) {
-						year.push(j + '-' + k + '-' + years[i]);
-					}
-				}
-
-				let op = await Match.progressOverall('123', year);
-				if (op.error) {
-					result.push({ year: years[i], op: op.error });
-				} else {
-					result.push({ year: years[i], op: op.doc });
-				}
-			}
-			res.json({ success: true, result });
 		}
-	});
+
+		// details for each year
+		let result = [];
+
+		for (let i = 0; i < years.length; i++) {
+			let year = [];
+			for (let j = 1; j <= 31; j++) {
+				for (let k = 1; k <= 12; k++) {
+					year.push(j + '-' + k + '-' + years[i]);
+				}
+			}
+
+			let op = await Match.progressOverall('123', year);
+			if (op.error) {
+				result.push({ year: years[i], op: op.error });
+			} else {
+				result.push({ year: years[i], op: op.doc });
+			}
+		}
+		res.json({ success: true, result });
+	}
 });
 
 // tournament
